@@ -11,7 +11,7 @@
                 const response = await fetch('/new');
                 const data = await response.json();
                 const email = data.email;
-                const tag = email.split('@')[0].substring(5); // Extract the tag from the generated email
+                const tag = email.split('@')[0].split('.')[1];
                 localStorage.setItem('tempmailTag', tag);
                 displayCurrentEmail(email);
                 fetchEmails(tag);
