@@ -1,6 +1,5 @@
 const express = require("express");
 const path = require("path");
-const fetch = require("node-fetch");
 
 const app = express();
 const TESTMAIL_NAMESPACE = process.env.TESTMAIL_NAMESPACE;
@@ -40,6 +39,7 @@ app.get("/mails", async (req, res) => {
     if (!tag) {
         return res.status(400).send({ error: "Invalid email" });
     }
+    const fetch = (await import('node-fetch')).default;
     const reqUrl = `https://api.testmail.app/api/json?apikey=${TESTMAIL_API_KEY}&namespace=${TESTMAIL_NAMESPACE}&tag=${tag}`;
 
     try {
