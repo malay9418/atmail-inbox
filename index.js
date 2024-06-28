@@ -1,11 +1,12 @@
 const express = require("express");
+const path = require("path");
 
 const app = express();
-app.use(express.json());
 const TESTMAIL_API_KEY = process.env.TESTMAIL_API_KEY;
 const TESTMAIL_NAMESPACE = process.env.TESTMAIL_NAMESPACE;
-const port = process.env.PORT || 8080
+const port = process.env.PORT || 8080;
 
+// Function to generate a random tag of 6 characters
 const generateRandomTag = (length) => {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let result = '';
@@ -15,8 +16,26 @@ const generateRandomTag = (length) => {
     return result;
 };
 
-app.get("/", async (req, res) => {
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json());
+
+// Serve index.html on root path
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Serve JSON response with generated email on /new path
+app.get("/new", (req, res) => {
+    const randomTag = generateRandomTag(6);
+    const email = `${TESTMAIL_NAMESPACE}+${randomTag}@inbox.testmail.app`;
+    res.json({ email });
+});
+
+// Handle mails retrieval logic on /mails path
+app.get("/mails", async (req, res) => {
     const tag = req.query.tag;
+    console.log(tag);
     if (!tag) {
         return res.status(400).send({ error: "Invalid email" });
     }
@@ -27,7 +46,7 @@ app.get("/", async (req, res) => {
         const response = await fetch(reqUrl);
         if (!response.ok) {
             console.log("Network is not ok");
-            res.status(500).send({ error: error.message });
+            res.status(500).send({ error: "Failed to fetch emails" });
         }
         const data = await response.json();
         res.json(data);
@@ -36,14 +55,8 @@ app.get("/", async (req, res) => {
     }
 });
 
-app.get("/new", (req, res) => {
-    const randomTag = generateRandomTag(6);
-    const email = `${TESTMAIL_NAMESPACE}.${randomTag}@inbox.testmail.app`;
-    res.json({ mail: email });
-});
-
 app.listen(port, () => {
-    console.log("Running on port 5000.");
+    console.log(`Running on port ${port}.`);
 });
 
 module.exports = app;
