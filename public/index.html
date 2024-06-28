@@ -11,8 +11,10 @@
                 const response = await fetch('/new');
                 const data = await response.json();
                 const email = data.email;
-                const tag = email.split('@')[0].split('.')[1]; // Extract the tag without the dot
+                const namespace = email.split('.')[0]; // Extract the namespace from the generated email
+                const tag = email.split('.')[1];
                 localStorage.setItem('tempmailTag', tag);
+                localStorage.setItem('tempmailNamespace', namespace);
                 displayCurrentEmail(email);
                 fetchEmails(tag);
             } catch (error) {
@@ -22,7 +24,9 @@
 
         async function fetchEmails(tag) {
             try {
-                const response = await fetch(`/mails?tag=${tag}`);
+                const namespace = localStorage.getItem('tempmailNamespace');
+                const { default: fetch } = await import('node-fetch');
+                const response = await fetch(`/mails?tag=${namespace}.${tag}`);
                 const data = await response.json();
                 displayEmails(data.emails);
             } catch (error) {
@@ -52,8 +56,9 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const tag = localStorage.getItem('tempmailTag');
-            if (tag) {
-                const currentEmail = `${TESTMAIL_NAMESPACE}.${tag}@inbox.testmail.app`;
+            const namespace = localStorage.getItem('tempmailNamespace');
+            if (tag && namespace) {
+                const currentEmail = `${namespace}.${tag}@inbox.testmail.app`;
                 displayCurrentEmail(currentEmail);
                 fetchEmails(tag);
             } else {
@@ -63,7 +68,8 @@
 
         function refreshEmails() {
             const tag = localStorage.getItem('tempmailTag');
-            if (tag) {
+            const namespace = localStorage.getItem('tempmailNamespace');
+            if (tag && namespace) {
                 fetchEmails(tag);
             } else {
                 generateNewMail();
