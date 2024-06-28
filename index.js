@@ -1,9 +1,10 @@
 const express = require("express");
 const path = require("path");
+const fetch = require("node-fetch");
 
 const app = express();
-const TESTMAIL_API_KEY = process.env.TESTMAIL_API_KEY;
 const TESTMAIL_NAMESPACE = process.env.TESTMAIL_NAMESPACE;
+const TESTMAIL_API_KEY = process.env.TESTMAIL_API_KEY;
 const port = process.env.PORT || 8080;
 
 // Function to generate a random tag of 6 characters
@@ -22,7 +23,7 @@ app.use(express.json());
 
 // Serve index.html on root path
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Serve JSON response with generated email on /new path
@@ -42,7 +43,6 @@ app.get("/mails", async (req, res) => {
     const reqUrl = `https://api.testmail.app/api/json?apikey=${TESTMAIL_API_KEY}&namespace=${TESTMAIL_NAMESPACE}&tag=${tag}`;
 
     try {
-        const fetch = (await import('node-fetch')).default;
         const response = await fetch(reqUrl);
         if (!response.ok) {
             console.log("Network is not ok");
