@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temp Mail Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script>
+        async function generateNewMail() {
+            try {
+                const response = await fetch('/new');
+                const data = await response.json();
+                const email = data.email;
+                const tag = email.split('@')[0].substring(5); // Extract the tag from the generated email
+                localStorage.setItem('tempmailTag', tag);
+                displayCurrentEmail(email);
+                fetchEmails(tag);
+            } catch (error) {
+                console.error('Failed to generate new mail:', error);
+            }
+        }
+
+        async function fetchEmails(tag) {
+            try {
+                const response = await fetch(`/mails?tag=${tag}`);
+                const data = await response.json();
+                displayEmails(data.emails);
+            } catch (error) {
+                console.error('Failed to fetch emails:', error);
+            }
+        }
+
+        function displayEmails(emails) {
+            const emailList = document.getElementById('emailList');
+            emailList.innerHTML = '';
+            emails.forEach(email => {
+                const emailItem = document.createElement('div');
+                emailItem.className = 'bg-gray-100 p-4 rounded-lg mb-4';
+                emailItem.innerHTML = `
+                    <p><strong>From:</strong> ${email.from}</p>
+                    <p><strong>Subject:</strong> ${email.subject}</p>
+                    <p><strong>Date:</strong> ${new Date(email.date).toLocaleString()}</p>
+                    <p><strong>Text:</strong> ${email.text}</p>
+                `;
+                emailList.appendChild(emailItem);
+            });
+        }
+
+        function displayCurrentEmail(email) {
+            document.getElementById('currentEmail').textContent = email;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const tag = localStorage.getItem('tempmailTag');
+            if (tag) {
+                const currentEmail = `4lzn6${tag}@inbox.testmail.app`;
+                displayCurrentEmail(currentEmail);
+                fetchEmails(tag);
+            } else {
+                generateNewMail();
+            }
+        });
+
+        function refreshEmails() {
+            const tag = localStorage.getItem('tempmailTag');
+            if (tag) {
+                fetchEmails(tag);
+            } else {
+                generateNewMail();
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+
+    <div class="container mx-auto my-10 p-5">
+        <div class="text-center mb-10">
+            <h1 class="text-4xl font-bold">Temp Mail Dashboard</h1>
+            <p class="text-lg mt-2">Manage your temporary email address</p>
+        </div>
+        <div class="flex justify-center mb-6">
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4" onclick="generateNewMail()">Generate New Mail</button>
+            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" onclick="refreshEmails()">Refresh Mails</button>
+        </div>
+        <div class="text-center mb-6">
+            <p class="text-xl">Current Email: <span id="currentEmail" class="font-mono text-blue-600"></span></p>
+        </div>
+        <div id="emailList" class="bg-white p-6 rounded-lg shadow-lg">
+            <!-- Emails will be displayed here -->
+        </div>
+    </div>
+
+</body>
+</html>
