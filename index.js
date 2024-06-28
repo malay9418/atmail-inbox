@@ -1,10 +1,10 @@
 const express = require("express");
-const fetch = require("node-fetch");
 
 const app = express();
 app.use(express.json());
 const TESTMAIL_API_KEY = process.env.TESTMAIL_API_KEY;
 const TESTMAIL_NAMESPACE = process.env.TESTMAIL_NAMESPACE;
+const port = process.env.PORT || 8080
 
 app.get("/", async (req, res) => {
     const tag = req.query.tag;
@@ -13,8 +13,9 @@ app.get("/", async (req, res) => {
         return res.status(400).send({ error: "Invalid email" });
     }
     const reqUrl = `https://api.testmail.app/api/json?apikey=${TESTMAIL_API_KEY}&namespace=${TESTMAIL_NAMESPACE}&tag=${tag}`;
-    
+
     try {
+        const fetch = (await import('node-fetch')).default;
         const response = await fetch(reqUrl);
         if (!response.ok) {
             console.log("Network is not ok");
@@ -27,7 +28,7 @@ app.get("/", async (req, res) => {
     }
 });
 
-app.listen(5000, () => {
+app.listen(port, () => {
     console.log("Running on port 5000.");
 });
 
