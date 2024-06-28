@@ -1,46 +1,43 @@
 const express = require("express");
 const path = require("path");
+const { default: fetch } = require("node-fetch");
 
 const app = express();
 const port = process.env.PORT || 8080;
+const TESTMAIL_NAMESPACE = process.env.TESTMAIL_NAMESPACE;
 
 // Function to generate a random tag of 6 characters
-const generateRandomTag = (length) => {
+const generateRandomTag = () => {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let result = '';
-    for (let i = 0; i < length; i++) {
+    for (let i = 0; i < 6; i++) {
         result += characters.charAt(Math.floor(Math.random() * characters.length));
     }
     return result;
 };
-
-app.use(express.json());
 
 // Serve index.html on root path
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Serve JSON response with generated email on /new path
-app.get("/new", async (req, res) => {
-    const randomTag = generateRandomTag(6);
-    const email = `${randomTag}@inbox.testmail.app`;
-    res.json({ email });
+// Endpoint to fetch current namespace
+app.get("/namespace", (req, res) => {
+    res.json({ namespace: TESTMAIL_NAMESPACE });
 });
 
-// Handle mails retrieval logic on /mails path
+// Endpoint to fetch mails based on tag
 app.get("/mails", async (req, res) => {
     const tag = req.query.tag;
     if (!tag) {
-        return res.status(400).send({ error: "Invalid email" });
+        return res.status(400).send({ error: "Invalid tag" });
     }
 
     try {
-        const { default: fetch } = await import('node-fetch');
-        const reqUrl = `https://api.testmail.app/api/json?namespace=${tag.split('.')[0]}&tag=${tag.split('.')[1]}`;
+        const reqUrl = `https://api.testmail.app/api/json?namespace=${TESTMAIL_NAMESPACE}&tag=${tag}`;
         const response = await fetch(reqUrl);
         if (!response.ok) {
-            console.log("Network is not ok");
+            console.log("Failed to fetch emails:", response.statusText);
             res.status(500).send({ error: "Failed to fetch emails" });
             return;
         }
