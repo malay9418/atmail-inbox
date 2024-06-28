@@ -2,8 +2,6 @@ const express = require("express");
 const path = require("path");
 
 const app = express();
-const TESTMAIL_NAMESPACE = process.env.TESTMAIL_NAMESPACE;
-const TESTMAIL_API_KEY = process.env.TESTMAIL_API_KEY;
 const port = process.env.PORT || 8080;
 
 // Function to generate a random tag of 6 characters
@@ -26,31 +24,32 @@ app.get("/", (req, res) => {
 });
 
 // Serve JSON response with generated email on /new path
-app.get("/new", (req, res) => {
+app.get("/new", async (req, res) => {
     const randomTag = generateRandomTag(6);
-    const email = `${TESTMAIL_NAMESPACE}.${randomTag}@inbox.testmail.app`;
+    const email = `${randomTag}@inbox.testmail.app`;
     res.json({ email });
 });
 
 // Handle mails retrieval logic on /mails path
 app.get("/mails", async (req, res) => {
     const tag = req.query.tag;
-    console.log(tag);
     if (!tag) {
         return res.status(400).send({ error: "Invalid email" });
     }
-    const fetch = (await import('node-fetch')).default;
-    const reqUrl = `https://api.testmail.app/api/json?apikey=${TESTMAIL_API_KEY}&namespace=${TESTMAIL_NAMESPACE}&tag=${tag}`;
 
     try {
+        const { default: fetch } = await import('node-fetch');
+        const reqUrl = `https://api.testmail.app/api/json?namespace=${tag.split('.')[0]}&tag=${tag.split('.')[1]}`;
         const response = await fetch(reqUrl);
         if (!response.ok) {
             console.log("Network is not ok");
             res.status(500).send({ error: "Failed to fetch emails" });
+            return;
         }
         const data = await response.json();
         res.json(data);
     } catch (error) {
+        console.error('Failed to fetch emails:', error);
         res.status(500).send({ error: error.message });
     }
 });
