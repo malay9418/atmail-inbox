@@ -14,13 +14,11 @@ const generateRandomTag = (length) => {
     return result;
 };
 
-// Serve static files from the 'public' directory
-app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
 // Serve index.html on root path
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Serve JSON response with generated email on /new path
