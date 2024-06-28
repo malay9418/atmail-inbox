@@ -1,11 +1,17 @@
 const express = require("express");
 
 const app = express();
+app.use(express.json());
 const TESTMAIL_API_KEY = process.env.TESTMAIL_API_KEY;
-console.log("api key is: ");
 
 app.get("/", (req, res) => {
-    res.send("Express on Vercel" + TESTMAIL_API_KEY);
+    const namespace = req.query.namespace;
+    if(!namespace) {
+        return res.status(400).send({ error: "Invalid email" });
+    }
+    res.json({
+        "namespace":namespace
+    });
 });
 
 app.listen(5000, () => {
