@@ -53,7 +53,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const tag = localStorage.getItem('tempmailTag');
             if (tag) {
-                const currentEmail = `4lzn6${tag}@inbox.testmail.app`;
+                const currentEmail = `4lzn6.${tag}@inbox.testmail.app`;
                 displayCurrentEmail(currentEmail);
                 fetchEmails(tag);
             } else {
