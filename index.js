@@ -4,6 +4,7 @@ const path = require("path");
 const app = express();
 const port = process.env.PORT || 8080;
 const TESTMAIL_NAMESPACE = process.env.TESTMAIL_NAMESPACE;
+const TESTMAIL_API_KEY = process.env.TESTMAIL_API_KEY;
 
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
@@ -21,7 +22,7 @@ app.get("/mails", async (req, res) => {
 
     try {
         const fetch = (await import('node-fetch')).default;
-        const reqUrl = `https://api.testmail.app/api/json?namespace=${TESTMAIL_NAMESPACE}&tag=${tag}`;
+        const reqUrl = `https://api.testmail.app/api/json?apikey=${TESTMAIL_API_KEY}&namespace=${TESTMAIL_NAMESPACE}&tag=${tag}`;
         const response = await fetch(reqUrl);
         if (!response.ok) {
             console.log("Failed to fetch emails:", response.statusText);
