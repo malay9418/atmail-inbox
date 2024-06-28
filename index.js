@@ -28,7 +28,7 @@ app.get("/", (req, res) => {
 // Serve JSON response with generated email on /new path
 app.get("/new", (req, res) => {
     const randomTag = generateRandomTag(6);
-    const email = `${TESTMAIL_NAMESPACE}+${randomTag}@inbox.testmail.app`;
+    const email = `${TESTMAIL_NAMESPACE}.${randomTag}@inbox.testmail.app`;
     res.json({ email });
 });
 
