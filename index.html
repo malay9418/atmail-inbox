@@ -11,7 +11,7 @@
                 const response = await fetch('/new');
                 const data = await response.json();
                 const email = data.email;
-                const tag = email.split('@')[0].split('.')[1];
+                const tag = email.split('@')[0].split('.')[1]; // Extract the tag without the dot
                 localStorage.setItem('tempmailTag', tag);
                 displayCurrentEmail(email);
                 fetchEmails(tag);
@@ -53,7 +53,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const tag = localStorage.getItem('tempmailTag');
             if (tag) {
-                const currentEmail = `4lzn6.${tag}@inbox.testmail.app`;
+                const currentEmail = `${TESTMAIL_NAMESPACE}.${tag}@inbox.testmail.app`;
                 displayCurrentEmail(currentEmail);
                 fetchEmails(tag);
             } else {
