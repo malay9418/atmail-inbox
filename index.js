@@ -8,7 +8,6 @@ const port = process.env.PORT || 8080
 
 app.get("/", async (req, res) => {
     const tag = req.query.tag;
-    console.log(tag);
     if (!tag) {
         return res.status(400).send({ error: "Invalid email" });
     }
