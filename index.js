@@ -5,7 +5,7 @@ const TESTMAIL_API_KEY = process.env.TESTMAIL_API_KEY;
 console.log("api key is: ", TESTMAIL_API_KEY);
 
 app.get("/", (req, res) => {
-    res.send("Express on Vercel");
+    res.send("Express on Vercel" + TESTMAIL_API_KEY);
 });
 
 app.listen(5000, () => {
